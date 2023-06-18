@@ -11,9 +11,12 @@
     "url": "git+https://github.com/almeidabbm/tickety.git"
   },
   "author": "Bruno Almeida",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/almeidabbm/tickety/issues"
   },
-  "homepage": "https://github.com/almeidabbm/tickety#readme"
+  "homepage": "https://github.com/almeidabbm/tickety#readme",
+  "devDependencies": {
+    "electron": "^25.1.1"
+  }
 }
