@@ -1,0 +1,19 @@
+{
+  "name": "tickety",
+  "version": "1.0.0",
+  "description": "An app to iterate queue tickets while displaying a photo roll",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/almeidabbm/tickety.git"
+  },
+  "author": "Bruno Almeida",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/almeidabbm/tickety/issues"
+  },
+  "homepage": "https://github.com/almeidabbm/tickety#readme"
+}
