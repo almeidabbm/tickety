@@ -11,7 +11,21 @@ function nextTicket() {
     ticket++;
   }
 
+  changeBackground();
   ticketNumber.innerText = ticket;
+}
+
+function changeBackground() {
+  const currentBg = document.getElementById("backgroundOverlay");
+
+  if (currentBg && currentBg.src) {
+    const bgParts = currentBg.src.split("/");
+    const currentBackground = bgParts[bgParts.length - 1];
+
+    const newBackground = loadedBackgrounds.find((bg) => bg != currentBackground);
+    bgParts[bgParts.length - 1] = newBackground;
+    document.getElementById("backgroundOverlay").src = bgParts.join("/");
+  }
 }
 
 document.addEventListener("keydown", ({ key }) => {
