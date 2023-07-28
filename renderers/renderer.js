@@ -1,7 +1,12 @@
-const ticketNumber = document.getElementById("ticketNumber");
-const MAX_TICKET_NUM = 9;
+const MAX_TICKET_NUM = 99;
 let ticket = 1;
+let loadedBackgrounds = [];
 
+utils.fetchBackgrounds().then((bgs) => {
+  loadedBackgrounds = bgs;
+});
+
+const ticketNumber = document.getElementById("ticketNumber");
 ticketNumber.innerText = ticket;
 
 function nextTicket() {
@@ -16,15 +21,21 @@ function nextTicket() {
 }
 
 function changeBackground() {
-  const currentBg = document.getElementById("backgroundOverlay");
+  const currentBackgroundEl = document.getElementById("backgroundOverlay");
 
-  if (currentBg && currentBg.src) {
-    const bgParts = currentBg.src.split("/");
-    const currentBackground = bgParts[bgParts.length - 1];
+  if (currentBackgroundEl && currentBackgroundEl.src) {
+    const backgroundParts = currentBackgroundEl.src.split("/");
+    const currentBackground = backgroundParts[backgroundParts.length - 1];
 
-    const newBackground = loadedBackgrounds.find((bg) => bg != currentBackground);
-    bgParts[bgParts.length - 1] = newBackground;
-    document.getElementById("backgroundOverlay").src = bgParts.join("/");
+    if (loadedBackgrounds.length > 0) {
+      let currentBackgroundIndex = loadedBackgrounds.indexOf(currentBackground);
+
+      // reset the index if we're on the last background
+      currentBackgroundIndex = currentBackgroundIndex >= loadedBackgrounds.length - 1 ? 0 : currentBackgroundIndex + 1;
+
+      backgroundParts[backgroundParts.length - 1] = loadedBackgrounds[currentBackgroundIndex];
+      document.getElementById("backgroundOverlay").src = backgroundParts.join("/");
+    }
   }
 }
 
