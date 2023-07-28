@@ -1,0 +1,45 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#mainContainer {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: darkslategray;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+#backgroundOverlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 80%;
+  z-index: -1;
+}
+
+#title {
+  color: white;
+  font-size: 28pt;
+}
+
+#ticketContainer {
+  display: flex;
+  background-color: whitesmoke;
+  padding: 10% 15%;
+  border-radius: 5%;
+}
+
+#ticketNumber {
+  color: darkslategrey;
+  font-weight: bold;
+  font-size: 48pt;
+  margin: 0;
+}

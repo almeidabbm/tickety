@@ -1,38 +1,27 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
+const fs = require("node:fs");
+const path = require("node:path");
 const electronReload = require("electron-reload");
 electronReload(__dirname);
-
-const MAX_TICKET_NUM = 9;
-
-let ticket = 0;
-
-function nextTicket() {
-  if (ticket >= MAX_TICKET_NUM) {
-    ticket = 1;
-  } else {
-    ticket++;
-  }
-
-  return ticket;
-}
 
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, "preloaders", "preloader.js"),
+    },
   });
 
-  win.webContents.on("before-input-event", (e, i) => {
-    if (i.key === "Enter" && i.type === "keyDown") {
-      const currentTicket = nextTicket();
-      console.log(`Current ticket is ${currentTicket}`);
-    }
-  });
-
-  win.loadFile("index.html");
+  win.loadFile(path.join(__dirname, "app", "index.html"));
 };
 
 app.whenReady().then(() => {
+  ipcMain.handle("backgrounds", () => {
+    const backgrounds = fs.readdirSync(path.join(__dirname, "assets", "images"));
+    return backgrounds;
+  });
+
   createWindow();
 
   app.on("activate", () => {
