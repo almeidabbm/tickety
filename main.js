@@ -1,11 +1,14 @@
 const { app, BrowserWindow } = require("electron");
-const MAX_TICKET_NUM = 99;
+const electronReload = require("electron-reload");
+electronReload(__dirname);
+
+const MAX_TICKET_NUM = 9;
 
 let ticket = 0;
 
 function nextTicket() {
   if (ticket >= MAX_TICKET_NUM) {
-    ticket = 0;
+    ticket = 1;
   } else {
     ticket++;
   }
@@ -31,4 +34,12 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
   createWindow();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
