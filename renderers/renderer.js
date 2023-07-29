@@ -9,19 +9,31 @@ utils.fetchBackgrounds().then((bgs) => {
 const ticketNumber = document.getElementById("ticketNumber");
 ticketNumber.innerText = ticket;
 
-function nextTicket() {
-  if (ticket >= MAX_TICKET_NUM) {
-    ticket = 1;
-  } else {
-    ticket++;
-  }
+function getActiveBackgroundImg() {
+  return document.querySelector("img.backgroundOverlay:not([hidden])");
+}
 
-  changeBackground();
-  ticketNumber.innerText = ticket;
+function getHiddenBackgroundImg() {
+  return document.querySelector("img.backgroundOverlay[hidden]");
+}
+
+function toggleImageEl(newBackground) {
+  const hiddenImgEl = getHiddenBackgroundImg();
+  const activeImgEl = getActiveBackgroundImg();
+
+  if (hiddenImgEl && activeImgEl) {
+    // Setting the hidden to be shown
+    hiddenImgEl.removeAttribute("hidden");
+    hiddenImgEl.src = newBackground;
+
+    // Setting the shown to be hidden
+    activeImgEl.setAttribute("hidden", true);
+    activeImgEl.removeAttribute("src");
+  }
 }
 
 function changeBackground() {
-  const currentBackgroundEl = document.getElementById("backgroundOverlay");
+  const currentBackgroundEl = getActiveBackgroundImg();
 
   if (currentBackgroundEl && currentBackgroundEl.src) {
     const backgroundParts = currentBackgroundEl.src.split("/");
@@ -34,9 +46,20 @@ function changeBackground() {
       currentBackgroundIndex = currentBackgroundIndex >= loadedBackgrounds.length - 1 ? 0 : currentBackgroundIndex + 1;
 
       backgroundParts[backgroundParts.length - 1] = loadedBackgrounds[currentBackgroundIndex];
-      document.getElementById("backgroundOverlay").src = backgroundParts.join("/");
+      toggleImageEl(backgroundParts.join("/"));
     }
   }
+}
+
+function nextTicket() {
+  if (ticket >= MAX_TICKET_NUM) {
+    ticket = 1;
+  } else {
+    ticket++;
+  }
+
+  changeBackground();
+  ticketNumber.innerText = ticket;
 }
 
 document.addEventListener("keydown", ({ key }) => {

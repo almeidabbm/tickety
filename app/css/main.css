@@ -24,7 +24,7 @@ html, body {
   z-index: 0;
 }
 
-#backgroundOverlay {
+.backgroundOverlay {
   position: absolute;
   height: auto;
   width: 100%;
