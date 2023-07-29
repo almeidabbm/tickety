@@ -1,8 +1,14 @@
+@font-face {
+  font-family: Oswald;
+  src: url("../../assets/fonts/Oswald-VariableFont_wght.woff2");
+}
+
 html, body {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: Oswald;
 }
 
 #mainContainer {
@@ -14,32 +20,47 @@ html, body {
   background-color: darkslategray;
   height: 100%;
   width: 100%;
+  overflow-y: hidden;
   z-index: 0;
 }
 
 #backgroundOverlay {
   position: absolute;
-  height: 100%;
+  height: auto;
   width: 100%;
   opacity: 80%;
   z-index: -1;
 }
 
-#title {
-  color: white;
-  font-size: 28pt;
-}
-
 #ticketContainer {
   display: flex;
-  background-color: whitesmoke;
-  padding: 10% 15%;
-  border-radius: 5%;
-}
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 3rem 10rem;
+  border-radius: 2rem;
+  overflow: hidden;
+  
+  #ticketContainerOverlay {
+    position: absolute;
+    background-color: white;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    opacity: 85%;
+    z-index: -1;
+  }
 
-#ticketNumber {
-  color: darkslategrey;
-  font-weight: bold;
-  font-size: 48pt;
-  margin: 0;
+  #title {
+    color: orangered;
+    font-size: 8rem;
+    margin: 0;
+  }
+
+  #ticketNumber {
+    color: darkslategrey;
+    font-weight: bold;
+    font-size: 10rem;
+    margin: 0;
+  }
 }
