@@ -28,8 +28,18 @@ html, body {
   position: absolute;
   height: auto;
   width: 100%;
-  opacity: 80%;
+  display: block;
   z-index: -1;
+}
+
+.backgroundOverlay:not([hidden]) {
+  transition: opacity 5s;
+  opacity: 1;
+}
+
+.backgroundOverlay[hidden] {
+  transition: opacity 3s;
+  opacity: 0;
 }
 
 #ticketContainer {
@@ -40,6 +50,7 @@ html, body {
   padding: 3rem 10rem;
   border-radius: 2rem;
   overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   
   #ticketContainerOverlay {
     position: absolute;
@@ -47,7 +58,7 @@ html, body {
     height: 100%;
     width: 100%;
     top: 0;
-    opacity: 85%;
+    opacity: 95%;
     z-index: -1;
   }
 

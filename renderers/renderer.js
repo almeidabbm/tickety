@@ -23,12 +23,11 @@ function toggleImageEl(newBackground) {
 
   if (hiddenImgEl && activeImgEl) {
     // Setting the hidden to be shown
-    hiddenImgEl.removeAttribute("hidden");
     hiddenImgEl.src = newBackground;
+    hiddenImgEl.removeAttribute("hidden");
 
     // Setting the shown to be hidden
     activeImgEl.setAttribute("hidden", true);
-    activeImgEl.removeAttribute("src");
   }
 }
 
