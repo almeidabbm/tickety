@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "node --test",
+    "test:electron": "node scripts/test-electron.js",
     "start": "electron .",
     "dist": "electron-builder --publish never",
     "release": "electron-builder --publish always"
@@ -20,7 +21,7 @@
   },
   "homepage": "https://github.com/almeidabbm/tickety#readme",
   "devDependencies": {
-    "electron": "^25.1.1",
+    "electron": "22.3.27",
     "electron-builder": "^26.18.0",
     "electron-reload": "^2.0.0-alpha.1"
   },
@@ -39,7 +40,7 @@
     ],
     "publish": {
       "provider": "github",
-      "releaseType": "release"
+      "releaseType": "draft"
     },
     "mac": {
       "target": [
@@ -58,7 +59,8 @@
         {
           "target": "nsis",
           "arch": [
-            "x64"
+            "x64",
+            "ia32"
           ]
         }
       ]
@@ -73,5 +75,8 @@
       ],
       "category": "Office"
     }
+  },
+  "dependencies": {
+    "electron-updater": "6.8.11"
   }
 }
