@@ -1,4 +1,3 @@
-const MAX_TICKET_NUM = 99;
 let ticket = 1;
 let loadedBackgrounds = [];
 
@@ -38,24 +37,17 @@ function changeBackground() {
     const backgroundParts = currentBackgroundEl.src.split("/");
     const currentBackground = backgroundParts[backgroundParts.length - 1];
 
-    if (loadedBackgrounds.length > 0) {
-      let currentBackgroundIndex = loadedBackgrounds.indexOf(currentBackground);
+    const nextBackground = nextBackgroundName(loadedBackgrounds, currentBackground);
 
-      // reset the index if we're on the last background
-      currentBackgroundIndex = currentBackgroundIndex >= loadedBackgrounds.length - 1 ? 0 : currentBackgroundIndex + 1;
-
-      backgroundParts[backgroundParts.length - 1] = loadedBackgrounds[currentBackgroundIndex];
+    if (nextBackground) {
+      backgroundParts[backgroundParts.length - 1] = nextBackground;
       toggleImageEl(backgroundParts.join("/"));
     }
   }
 }
 
 function nextTicket() {
-  if (ticket >= MAX_TICKET_NUM) {
-    ticket = 1;
-  } else {
-    ticket++;
-  }
+  ticket = advanceTicket(ticket);
 
   changeBackground();
   ticketNumber.innerText = ticket;

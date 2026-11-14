@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 const electronReload = require("electron-reload");
+const { isImageFile } = require("./shared/queue");
 electronReload(__dirname);
 
 const createWindow = () => {
@@ -19,7 +20,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
   ipcMain.handle("backgrounds", () => {
     const backgrounds = fs.readdirSync(path.join(__dirname, "assets", "images"));
-    return backgrounds;
+    return backgrounds.filter(isImageFile);
   });
 
   createWindow();
