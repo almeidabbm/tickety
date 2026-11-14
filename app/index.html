@@ -1,22 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' file: data:; font-src 'self'; media-src 'none'"
+    />
     <link rel="stylesheet" href="./css/main.css" />
     <title>Tickety</title>
   </head>
   <body>
-    <div id="mainContainer">
-      <img class="backgroundOverlay" src="../assets/images/background.jpeg" />
-      <img class="backgroundOverlay" hidden />
-      <div id="ticketContainer">
+    <main id="screen">
+      <img class="backgroundOverlay" alt="" hidden />
+      <img class="backgroundOverlay" alt="" hidden />
+      <div id="scrim"></div>
+      <section id="ticketCard" aria-live="polite">
         <p id="title">Senha atual</p>
-        <p id="ticketNumber"></p>
-        <div id="ticketContainerOverlay" />
-      </div>
-    </div>
+        <p id="ticketNumber">–</p>
+        <div id="history" hidden>
+          <p>Anteriores</p>
+          <ol id="historyList"></ol>
+        </div>
+      </section>
+    </main>
+    <script src="../shared/queue.js"></script>
+    <script src="../renderers/renderer.js"></script>
   </body>
-  <script src="../shared/queue.js" type="application/javascript"></script>
-  <script src="../renderers/renderer.js" type="application/javascript"></script>
 </html>

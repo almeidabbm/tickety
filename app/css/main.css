@@ -1,77 +1,205 @@
 @font-face {
-  font-family: Oswald;
-  src: url("../../assets/fonts/Oswald-VariableFont_wght.woff2");
+  font-family: "Inter";
+  src: url("../../assets/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: block;
+}
+
+:root {
+  --ink: #0f1b2d;
+  --muted: #5b6676;
+  --accent: #e8572a;
+  --accent-soft: #fdeee8;
+  --surface: #ffffff;
+  --line: #e6e8ec;
+  --radius-lg: 28px;
+  --shadow-card: 0 1px 2px rgb(15 27 45 / .06), 0 12px 32px rgb(15 27 45 / .12), 0 40px 80px rgb(15 27 45 / .18);
+  --paper: #fbf8f3;
+  --panel-width: max(40vw, 66vh);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html, body {
-  width: 100%;
   height: 100%;
   margin: 0;
-  padding: 0;
-  font-family: Oswald;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  color: var(--ink);
+  cursor: none;
 }
 
-#mainContainer {
-  display: flex;
+p, ol {
+  margin: 0;
+  padding: 0;
+}
+
+#screen {
   position: relative;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: darkslategray;
   height: 100%;
-  width: 100%;
-  overflow-y: hidden;
-  z-index: 0;
+  overflow: hidden;
+  isolation: isolate;
+  /* Shown as-is when there are no photos. */
+  background: #33404f;
 }
 
 .backgroundOverlay {
   position: absolute;
-  height: auto;
-  width: 100%;
-  display: block;
-  z-index: -1;
-}
-
-.backgroundOverlay:not([hidden]) {
-  transition: opacity 5s;
+  inset: 0 var(--panel-width) 0 0;
+  width: calc(100% - var(--panel-width));
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
   opacity: 1;
+  transition: opacity 1.4s ease-in-out;
+  will-change: opacity;
 }
 
 .backgroundOverlay[hidden] {
-  transition: opacity 3s;
+  display: block;
   opacity: 0;
 }
 
-#ticketContainer {
+#scrim {
+  position: absolute;
+  inset: 0 var(--panel-width) 0 0;
+  z-index: -1;
+  background: linear-gradient(to left, rgb(15 27 45 / .25), rgb(15 27 45 / 0) 30%);
+}
+
+/* Solid panel anchored right, like a printed sign beside the photo. */
+#ticketCard {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: var(--panel-width);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  padding: 0 6vw 0 5vw;
+  background: var(--paper);
+  box-shadow: -1px 0 0 rgb(15 27 45 / .1);
+  perspective: 80vh;
+}
+
+#title {
   position: relative;
-  padding: 3rem 10rem;
-  border-radius: 2rem;
-  overflow: hidden;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-  
-  #ticketContainerOverlay {
-    position: absolute;
-    background-color: white;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    opacity: 95%;
-    z-index: -1;
-  }
+  padding-bottom: 2.2vh;
+  font-size: clamp(.9rem, 2.6vh, 2rem);
+  font-weight: 600;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
 
-  #title {
-    color: orangered;
-    font-size: 8rem;
-    margin: 0;
-  }
+/* The accent rule, a pseudo-element so it can sweep in with a transform. */
+#title::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: left;
+}
 
-  #ticketNumber {
-    color: darkslategrey;
-    font-weight: bold;
-    font-size: 10rem;
-    margin: 0;
+#ticketNumber {
+  margin: 1.5vh 0 0 -.06em;
+  font-size: min(42vh, 22vw);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
+  line-height: .9;
+  transform-origin: 50% 0;
+}
+
+#history {
+  padding-top: 5vh;
+}
+
+#history p {
+  padding-bottom: 1.2vh;
+  color: var(--muted);
+  font-size: clamp(.8rem, 1.9vh, 1.5rem);
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+#history ol {
+  display: flex;
+  overflow: hidden; /* the newest entry slides in from behind the left edge */
+  list-style: none;
+}
+
+#history li {
+  min-width: 2.2ch;
+  padding: .9vh 1.4vw 0 0;
+  border-top: 1px solid rgb(15 27 45 / .18);
+  color: var(--muted);
+  font-size: clamp(1.2rem, 6vh, 4.5rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+#history li:first-child {
+  color: var(--ink);
+}
+
+#history[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+/* One calm moment per call: number turns, rule sweeps, history shifts. Total ~600 ms. */
+@media (prefers-reduced-motion: no-preference) {
+  .call #ticketNumber { animation: flap 480ms var(--ease-quart); }
+  .call #title::after { animation: sweep 480ms var(--ease-expo) 120ms both; }
+  .call #history li { animation: shift 450ms var(--ease-quart) 80ms both; }
+  .call #history li:first-child { animation-name: slideIn; }
+
+  /* Back: quieter, shorter (~75%), no sweep. */
+  .back #ticketNumber { animation: flapBack 360ms var(--ease-quart); }
+  .back #history li { animation: shiftBack 340ms var(--ease-quart); }
+
+  /* First load, once: label, rule, number, history. */
+  .intro #title { animation: rise 360ms var(--ease-quart) both; }
+  .intro #title::after { animation: sweep 420ms var(--ease-expo) 100ms both; }
+  .intro #ticketNumber { animation: rise 400ms var(--ease-quart) 180ms both; }
+  .intro #history { animation: rise 340ms var(--ease-quart) 260ms both; }
+}
+
+@keyframes flap {
+  from { opacity: 0; transform: rotateX(-70deg); }
+  50% { opacity: 1; }
+}
+
+@keyframes flapBack {
+  from { opacity: 0; transform: rotateX(40deg); }
+}
+
+@keyframes sweep {
+  from { transform: scaleX(0); }
+}
+
+/* One history slot = min-width + right padding of an li. */
+@keyframes shift {
+  from { transform: translateX(calc(-2.2ch - 1.4vw)); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(calc(-2.2ch - 1.4vw)); }
+}
+
+@keyframes shiftBack {
+  from { transform: translateX(calc(2.2ch + 1.4vw)); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(1.5vh); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backgroundOverlay {
+    transition-duration: 300ms;
   }
 }
