@@ -6,16 +6,17 @@ Electron desktop app for a queue "now serving" screen: shows the current ticket 
 
 - `npm install` — install dependencies (Electron 25).
 - `npm start` — run the app. `electron-reload` restarts it on file changes.
-- No tests, linter, formatter, or build/packaging step exist. `npm test` is a placeholder that fails.
+- `npm test` — runs `node --test` over `*.test.js` (Node's built-in runner, no dependencies). No linter, formatter, or build/packaging step exist.
 - Debugging: VS Code compound launch "Main + renderer" in `.vscode/launch.json` (renderer attaches on port 9222).
 
 ## Layout
 
 - `main.js` — main process: creates the window, loads `app/index.html`, handles the `backgrounds` IPC call (lists `assets/images/`).
 - `preloaders/preloader.js` — exposes `window.utils.fetchBackgrounds()` via `contextBridge`. Any new main-process capability needs an `ipcMain.handle` in `main.js` plus an entry here.
+- `shared/queue.js` — pure logic (ticket wrap, background rotation, image-file filter). Loaded as a plain `<script>` by the page and `require`d by `main.js` and tests, so keep it free of DOM and Electron APIs. Tests sit next to it in `shared/queue.test.js`.
 - `renderers/renderer.js` — page logic, plain browser script (no modules, no bundler). Enter advances the ticket (1–99, wraps) and cross-fades to the next background.
 - `app/index.html`, `app/css/main.css` — markup and styles. CSS uses native nesting.
-- `assets/images/` — background photos; every file here is put in the rotation, so keep only images in it.
+- `assets/images/` — background photos; every image file here (by extension) is put in the rotation. Hidden and non-image files are ignored.
 - `assets/fonts/` — bundled Oswald font.
 
 ## How it works
@@ -28,4 +29,5 @@ Electron desktop app for a queue "now serving" screen: shows the current ticket 
 - Plain JavaScript, CommonJS in the main process, no framework, no dependencies beyond Electron. Keep it that way unless a change clearly needs more.
 - Double quotes, semicolons, 2-space indentation.
 - Conventional Commits (`feat:`, `fix:`).
-- Verify UI changes by running `npm start` and checking the window; there is no automated test surface.
+- Put new logic in `shared/queue.js` with a test, and keep the renderer as thin DOM wiring.
+- Run `npm test` after changes. Verify UI changes by running `npm start` and checking the window.
