@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' file: data: blob:; font-src 'self'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/admin.css" />
+    <title>Tickety — Administração</title>
+  </head>
+  <body>
+    <main id="admin">
+      <div class="column">
+        <section aria-labelledby="ticketHeading">
+          <h2 id="ticketHeading">Senha</h2>
+          <p class="lede">O número que está agora no ecrã.</p>
+          <div class="counter">
+            <button type="button" class="round" id="backButton" aria-label="Voltar à senha anterior">−</button>
+            <output id="currentTicket" aria-live="polite">–</output>
+            <button type="button" class="round primary" id="nextButton" aria-label="Chamar seguinte">+</button>
+          </div>
+          <form id="setForm" novalidate>
+            <label for="ticketInput">Saltar para a senha</label>
+            <div class="row">
+              <input id="ticketInput" type="number" inputmode="numeric" min="1" max="99" placeholder="1–99" aria-describedby="ticketError" />
+              <button type="submit">Definir</button>
+              <button type="button" class="quiet" id="resetButton">Repor a 1</button>
+            </div>
+            <p id="ticketError" class="error" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section aria-labelledby="soundHeading">
+          <h2 id="soundHeading">Som</h2>
+          <label class="switch">
+            <span><strong>Som ao chamar</strong><small>Um aviso curto e simpático a cada senha chamada.</small></span>
+            <input type="checkbox" role="switch" id="soundToggle" />
+            <span class="track" aria-hidden="true"></span>
+          </label>
+        </section>
+
+        <section aria-labelledby="updateHeading">
+          <h2 id="updateHeading">Atualizações</h2>
+          <p id="updateText" class="lede" role="status">A verificar…</p>
+          <div id="updateNotes" class="notes" hidden>
+            <p class="notesTitle"></p>
+            <p class="notesBody"></p>
+          </div>
+          <div class="row">
+            <button type="button" class="primary" id="updateButton" hidden></button>
+            <button type="button" id="checkButton">Procurar atualizações</button>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="column">
+        <section aria-labelledby="previewHeading">
+          <h2 id="previewHeading">No ecrã</h2>
+          <p class="lede">É isto que os clientes veem. Passe por uma fotografia para a experimentar.</p>
+          <div class="preview" aria-hidden="true">
+            <img id="previewPhoto" alt="" hidden />
+            <div class="previewPanel">
+              <p class="previewTitle">Senha atual</p>
+              <p id="previewNumber" class="previewNumber">–</p>
+              <div id="previewHistory" class="previewHistory" hidden>
+                <p>Anteriores</p>
+                <ol id="previewHistoryList"></ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="photos" aria-labelledby="photosHeading">
+          <h2 id="photosHeading">Fotografias</h2>
+          <p class="lede">Mudam no ecrã por esta ordem, uma a cada senha chamada. Arraste para trocar a ordem.</p>
+          <div id="dropZone" class="dropZone">
+            <p>Arraste fotografias ou pastas inteiras para aqui, ou</p>
+            <div class="row">
+              <button type="button" class="primary" id="pickButton">Escolher fotografias</button>
+              <button type="button" id="folderButton">Escolher pasta</button>
+            </div>
+            <input id="fileInput" type="file" accept="image/*" multiple hidden />
+            <input id="folderInput" type="file" webkitdirectory hidden />
+          </div>
+          <div class="statusRow">
+            <p id="photoStatus" class="status" role="status"></p>
+            <div id="uploadBar" class="progress" hidden><span></span></div>
+          </div>
+          <div id="photoError" class="error" role="alert"></div>
+          <p id="emptyState" class="empty" hidden>Ainda sem fotografias. Junte umas quantas da loja, da equipa ou da montra — o ecrã fica logo mais acolhedor.</p>
+          <ol id="photoGrid" class="grid" aria-label="Ordem das fotografias"></ol>
+        </section>
+      </div>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden>
+      <span>Fotografia removida</span>
+      <button type="button" id="undoButton">Anular</button>
+    </div>
+  </body>
+  <script src="../shared/queue.js" type="application/javascript"></script>
+  <script src="../renderers/admin.js" type="application/javascript"></script>
+</html>
