@@ -9,17 +9,34 @@ npm install
 npm start
 ```
 
-Press **Enter** to call the next ticket. Numbers go from 1 to 99 and then start again at 1. Each press also fades to the next photo.
+The app opens fullscreen. Press **Enter** (or Space / →) to call the next ticket, and **Backspace** (or ←) to go back. Numbers go from 1 to 99 and then start again at 1. Each call plays a soft chime and fades to the next photo. **F11** leaves or enters fullscreen.
 
-The ticket number is not saved: it goes back to 1 when the app restarts.
+The ticket number is saved, so it survives a restart.
 
-## Backgrounds
+## Admin
 
-Put photos (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.avif`, `.bmp`) in `assets/images/`. They rotate in file-name order. The first photo shown is `background.jpeg`.
+Press **Ctrl+,** (**Cmd+,** on a Mac) to open the admin window. From there you can set the number, turn the sound on or off, and manage photos: drop in photos or whole folders, drag to reorder, and remove (with undo).
+
+## Download
+
+Installers for Windows (7 or later, 32- and 64-bit), macOS (10.13 or later) and Linux are on the [releases page](https://github.com/almeidabbm/tickety/releases). Installed apps check for new versions every few hours. On Windows and Linux the update downloads in the background, and the admin window shows **Reiniciar e atualizar** when it's ready (it also installs the next time the app closes). On macOS the admin window links to the download page instead. They are not code-signed: on Windows choose "More info" → "Run anyway"; on macOS open System Settings → Privacy & Security → "Open Anyway".
 
 ## Development
 
 - `npm test` runs the unit tests.
+- `npm run dist` builds installers into `dist/`.
+
+## Releasing
+
+1. Add a `## <new version>` section to `CHANGELOG.md`, in short, plain Portuguese for counter staff. It becomes the release notes and shows in the admin window when the update arrives.
+2. Bump the version and push the tag:
+
+```sh
+npm version patch   # or minor / major: bumps package.json and creates a v* tag
+git push --follow-tags
+```
+
+CI checks the tag matches `package.json`, builds every platform into a draft release, then publishes it with the changelog notes. Installed apps update from it.
 - See `AGENTS.md` for the code layout and conventions.
 
 ## License
