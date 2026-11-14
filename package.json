@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "test": "node --test",
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "release": "electron-builder --publish always"
   },
   "repository": {
     "type": "git",
@@ -19,7 +21,57 @@
   "homepage": "https://github.com/almeidabbm/tickety#readme",
   "devDependencies": {
     "electron": "^25.1.1",
+    "electron-builder": "^26.18.0",
     "electron-reload": "^2.0.0-alpha.1"
   },
-  "dependencies": {}
+  "build": {
+    "appId": "com.almeidabbm.tickety",
+    "productName": "Tickety",
+    "files": [
+      "main.js",
+      "main/**",
+      "preloaders/**",
+      "renderers/**",
+      "shared/**",
+      "app/**",
+      "assets/**",
+      "!**/*.test.js"
+    ],
+    "publish": {
+      "provider": "github",
+      "releaseType": "release"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.business"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office"
+    }
+  }
 }
