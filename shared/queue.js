@@ -5,6 +5,16 @@ function advanceTicket(ticket) {
   return ticket >= MAX_TICKET_NUM ? 1 : ticket + 1;
 }
 
+function previousTicket(ticket) {
+  return ticket <= 1 ? MAX_TICKET_NUM : ticket - 1;
+}
+
+// Accepts a number or a digit string (e.g. from an input field); null if not a whole number in 1..99.
+function parseTicket(value) {
+  const number = typeof value === "string" && /^\s*\d+\s*$/.test(value) ? Number(value) : value;
+  return Number.isInteger(number) && number >= 1 && number <= MAX_TICKET_NUM ? number : null;
+}
+
 function nextBackgroundName(backgrounds, current) {
   if (backgrounds.length === 0) return undefined;
   const index = backgrounds.indexOf(current);
@@ -16,5 +26,12 @@ function isImageFile(name) {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { MAX_TICKET_NUM, advanceTicket, nextBackgroundName, isImageFile };
+  module.exports = {
+    MAX_TICKET_NUM,
+    advanceTicket,
+    previousTicket,
+    parseTicket,
+    nextBackgroundName,
+    isImageFile,
+  };
 }
