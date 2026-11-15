@@ -24,16 +24,16 @@ function setup({ seed = [] } = {}) {
 
 test("defaults on first run", () => {
   const { open } = setup();
-  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [] });
+  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null });
 });
 
 test("corrupt state file falls back to defaults", () => {
   const { dir, open } = setup();
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "state.json"), "{not json");
-  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [] });
+  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null });
   fs.writeFileSync(path.join(dir, "state.json"), JSON.stringify({ ticket: 500, sound: "yes", photos: "x" }));
-  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [] });
+  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null });
 });
 
 test("ticket and sound persist across a reload, written atomically", () => {
@@ -42,7 +42,7 @@ test("ticket and sound persist across a reload, written atomically", () => {
   store.setTicket(42);
   store.next();
   store.setSound(false);
-  assert.deepEqual(open().getState(), { ticket: 43, sound: false, photos: [] });
+  assert.deepEqual(open().getState(), { ticket: 43, sound: false, photos: [], sounds: [], chime: null });
   assert.ok(!fs.existsSync(path.join(dir, "state.json.tmp")));
 });
 
@@ -172,4 +172,61 @@ test("a write error is reported in Portuguese without the file path", () => {
   const store = open();
   fs.mkdirSync(path.join(dir, "state.json.tmp"));
   assert.throws(() => store.next(), (error) => !error.message.includes(dir) && /guardar/i.test(error.message));
+});
+
+const MP3 = Buffer.from("ID3");
+
+test("sounds: add, choose, persist and reload", () => {
+  const { open } = setup();
+  const store = open();
+  const { state, refused } = store.addSounds([
+    { name: "sino.mp3", data: MP3 },
+    { name: "ding.WAV", data: MP3 },
+    { name: "notas.txt", data: MP3 },
+  ]);
+  assert.deepEqual(state.sounds, ["sino.mp3", "ding.WAV"]);
+  assert.deepEqual(refused, ["notas.txt (não é um som)"]);
+  assert.equal(state.chime, null); // built-in chime stays the default
+  store.setChime("ding.WAV");
+  assert.equal(open().getState().chime, "ding.WAV");
+  store.setChime(null);
+  assert.equal(open().getState().chime, null);
+});
+
+test("sounds: refuse unknown choices, big files and path tricks", () => {
+  const { open, dir } = setup();
+  const store = open();
+  assert.throws(() => store.setChime("nao-existe.mp3"));
+  assert.throws(() => store.setChime(42));
+  const big = Buffer.alloc(5 * 1024 * 1024 + 1);
+  const { state, refused } = store.addSounds([
+    { name: "grande.mp3", data: big },
+    { name: "../../fora.mp3", data: MP3 },
+  ]);
+  assert.deepEqual(refused, ["grande.mp3 (maior que 5 MB)"]);
+  assert.deepEqual(state.sounds, ["fora.mp3"]);
+  assert.ok(fs.existsSync(path.join(dir, "sounds", "fora.mp3")));
+});
+
+test("sounds: removing the chosen sound falls back to the built-in chime", async () => {
+  const { open, trashed } = setup();
+  const store = open();
+  store.addSounds([{ name: "sino.mp3", data: MP3 }]);
+  store.setChime("sino.mp3");
+  const state = await store.removeSound("sino.mp3");
+  assert.deepEqual(state.sounds, []);
+  assert.equal(state.chime, null);
+  assert.equal(trashed.length, 1);
+  await assert.rejects(store.removeSound("sino.mp3"));
+});
+
+test("sounds: a chosen sound missing from disk falls back on load", () => {
+  const { open, dir } = setup();
+  const store = open();
+  store.addSounds([{ name: "sino.mp3", data: MP3 }]);
+  store.setChime("sino.mp3");
+  fs.unlinkSync(path.join(dir, "sounds", "sino.mp3"));
+  const state = open().getState();
+  assert.deepEqual(state.sounds, []);
+  assert.equal(state.chime, null);
 });

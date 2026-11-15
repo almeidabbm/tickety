@@ -25,6 +25,10 @@ function isImageFile(name) {
   return /\.(jpe?g|png|gif|webp|avif|bmp)$/i.test(name) && !name.startsWith(".");
 }
 
+function isSoundFile(name) {
+  return /\.(mp3|wav|ogg|oga|m4a|aac)$/i.test(name) && !name.startsWith(".");
+}
+
 if (typeof module !== "undefined") {
   module.exports = {
     MAX_TICKET_NUM,
@@ -33,5 +37,6 @@ if (typeof module !== "undefined") {
     parseTicket,
     nextBackgroundName,
     isImageFile,
+    isSoundFile,
   };
 }

@@ -1,9 +1,10 @@
 // Persistent state and photo storage. No Electron here: directories and trash are passed in, so tests can use a temp dir.
 const fs = require("node:fs");
 const path = require("node:path");
-const { advanceTicket, previousTicket, parseTicket, isImageFile } = require("../shared/queue");
+const { advanceTicket, previousTicket, parseTicket, isImageFile, isSoundFile } = require("../shared/queue");
 
 const MAX_PHOTO_BYTES = 25 * 1024 * 1024;
+const MAX_SOUND_BYTES = 5 * 1024 * 1024;
 
 function readJson(file) {
   try {
@@ -52,6 +53,8 @@ function renameWithRetry(from, to) {
 function openStore({ dir, seedDir, trash }) {
   const stateFile = path.join(dir, "state.json");
   const photosDir = path.join(dir, "backgrounds");
+  const soundsDir = path.join(dir, "sounds");
+  fs.mkdirSync(soundsDir, { recursive: true });
 
   if (!fs.existsSync(photosDir)) {
     fs.mkdirSync(photosDir, { recursive: true });
@@ -63,14 +66,20 @@ function openStore({ dir, seedDir, trash }) {
   }
 
   const raw = readJson(stateFile);
-  const onDisk = fs.readdirSync(photosDir).filter(isImageFile);
-  const listed = Array.isArray(raw.photos)
-    ? raw.photos.filter((name, i, all) => onDisk.includes(name) && all.indexOf(name) === i)
-    : [];
+  // The saved order wins; files missing on disk are dropped and new ones on disk go at the end.
+  const reconcile = (saved, folder, isValid) => {
+    const onDisk = fs.readdirSync(folder).filter(isValid);
+    const listed = Array.isArray(saved) ? saved.filter((name, i, all) => onDisk.includes(name) && all.indexOf(name) === i) : [];
+    return [...listed, ...onDisk.filter((name) => !listed.includes(name))];
+  };
+  const sounds = reconcile(raw.sounds, soundsDir, isSoundFile);
   let state = {
     ticket: parseTicket(raw.ticket) ?? 1,
     sound: typeof raw.sound === "boolean" ? raw.sound : true,
-    photos: [...listed, ...onDisk.filter((name) => !listed.includes(name))],
+    photos: reconcile(raw.photos, photosDir, isImageFile),
+    sounds,
+    // null = the built-in chime.
+    chime: sounds.includes(raw.chime) ? raw.chime : null,
   };
 
   // Write first, then update memory, so a failed save never leaves the two out of step.
@@ -95,8 +104,34 @@ function openStore({ dir, seedDir, trash }) {
     return state;
   };
 
+  const photos = { key: "photos", folder: photosDir, isValid: isImageFile, maxBytes: MAX_PHOTO_BYTES, kind: "uma imagem", limit: "25 MB" };
+  const soundFiles = { key: "sounds", folder: soundsDir, isValid: isSoundFile, maxBytes: MAX_SOUND_BYTES, kind: "um som", limit: "5 MB" };
+
+  // files: [{ name, data: Buffer }]. Saves the valid ones; refused lists the others with the reason.
+  const addFiles = (files, { key, folder, isValid, maxBytes, kind, limit }) => {
+    const added = [];
+    const refused = [];
+    for (const { name, data } of files) {
+      const safe = safeName(name);
+      if (!isValid(safe)) refused.push(`${name} (não é ${kind})`);
+      else if (data.length > maxBytes) refused.push(`${name} (maior que ${limit})`);
+      else {
+        const unique = uniqueName(folder, safe, [...state[key], ...added]);
+        try {
+          fs.writeFileSync(path.join(folder, unique), data, { flag: "wx" });
+          added.push(unique);
+        } catch (error) {
+          console.error(`could not save ${key}:`, error);
+          refused.push(`${name} (não foi possível guardar)`);
+        }
+      }
+    }
+    return { state: added.length ? commit({ [key]: [...state[key], ...added] }) : state, refused };
+  };
+
   return {
     photosDir,
+    soundsDir,
     getState: () => state,
     next: () => commit({ ticket: advanceTicket(state.ticket) }),
     back: () => commit({ ticket: previousTicket(state.ticket) }),
@@ -106,26 +141,20 @@ function openStore({ dir, seedDir, trash }) {
       return commit({ ticket });
     },
     setSound: (sound) => commit({ sound: Boolean(sound) }),
-    // files: [{ name, data: Buffer }]. Saves the valid ones; refused lists the others with the reason.
-    addPhotos: (files) => {
-      const added = [];
-      const refused = [];
-      for (const { name, data } of files) {
-        const safe = safeName(name);
-        if (!isImageFile(safe)) refused.push(`${name} (não é uma imagem)`);
-        else if (data.length > MAX_PHOTO_BYTES) refused.push(`${name} (maior que 25 MB)`);
-        else {
-          const unique = uniqueName(photosDir, safe, [...state.photos, ...added]);
-          try {
-            fs.writeFileSync(path.join(photosDir, unique), data, { flag: "wx" });
-            added.push(unique);
-          } catch (error) {
-            console.error("could not save photo:", error);
-            refused.push(`${name} (não foi possível guardar)`);
-          }
-        }
-      }
-      return { state: added.length ? commit({ photos: [...state.photos, ...added] }) : state, refused };
+    addPhotos: (files) => addFiles(files, photos),
+    addSounds: (files) => addFiles(files, soundFiles),
+    setChime: (name) => {
+      if (name !== null && !state.sounds.includes(name)) throw new Error("Som não encontrado.");
+      return commit({ chime: name });
+    },
+    removeSound: async (name) => {
+      if (!state.sounds.includes(name)) throw new Error("Som não encontrado.");
+      const file = path.join(soundsDir, name);
+      if (fs.existsSync(file)) await trash(file);
+      return commit({
+        sounds: state.sounds.filter((sound) => sound !== name),
+        chime: state.chime === name ? null : state.chime,
+      });
     },
     reorderPhotos: (names) => {
       const isPermutation =
@@ -145,4 +174,4 @@ function openStore({ dir, seedDir, trash }) {
   };
 }
 
-module.exports = { MAX_PHOTO_BYTES, openStore };
+module.exports = { MAX_PHOTO_BYTES, MAX_SOUND_BYTES, openStore };

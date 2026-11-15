@@ -45,3 +45,9 @@ test("isImageFile keeps images and drops system files", () => {
   assert.ok(!isImageFile("notes.txt"));
   assert.ok(!isImageFile("._background.jpeg"));
 });
+
+test("isSoundFile keeps common audio formats and drops the rest", () => {
+  const { isSoundFile } = require("./queue");
+  for (const ok of ["a.mp3", "b.WAV", "c.ogg", "d.m4a", "e.aac", "f.oga"]) assert.ok(isSoundFile(ok), ok);
+  for (const bad of ["a.txt", ".hidden.mp3", "mp3", "a.mp3.exe"]) assert.ok(!isSoundFile(bad), bad);
+});
