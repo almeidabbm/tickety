@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' file: data:; font-src 'self'; media-src 'none'"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' file: data:; font-src 'self'; media-src file:"
     />
     <link rel="stylesheet" href="./css/main.css" />
     <title>Tickety</title>
@@ -25,6 +25,7 @@
       </section>
     </main>
     <script src="../shared/queue.js"></script>
+    <script src="../shared/chime.js"></script>
     <script src="../renderers/renderer.js"></script>
   </body>
 </html>

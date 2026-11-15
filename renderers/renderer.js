@@ -42,19 +42,33 @@ function renderTicket(motion) {
 }
 
 function chime() {
-  const now = audio.currentTime;
-  [[659.25, 0, 0.35, 0.9], [523.25, 0.32, 1.4, 0.6]].forEach(([freq, start, length, gain]) => {
-    const osc = audio.createOscillator();
-    const env = audio.createGain();
-    osc.type = "sine";
-    osc.frequency.value = freq;
-    env.gain.setValueAtTime(0, now + start);
-    env.gain.linearRampToValueAtTime(0.25 * gain, now + start + 0.015);
-    env.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
-    osc.connect(env).connect(audio.destination);
-    osc.start(now + start);
-    osc.stop(now + start + length + 0.05);
+  playChime(audio);
+}
+
+const MAX_SOUND_SECONDS = 6;
+let playing;
+
+// An uploaded sound plays for at most 6 s, then fades out, so a long file can't drown the next call.
+// Anything wrong with the file falls back to the built-in chime.
+function playCall(state) {
+  const choice = state.chime && state.sounds.find((sound) => sound.name === state.chime);
+  if (!choice) return chime();
+  if (playing) playing.pause();
+  const player = new Audio(choice.url);
+  playing = player;
+  player.play().catch((err) => {
+    console.error("could not play the chosen sound", err);
+    chime();
   });
+  setTimeout(() => {
+    const fade = setInterval(() => {
+      player.volume = Math.max(0, player.volume - 0.1);
+      if (player.volume === 0) {
+        clearInterval(fade);
+        player.pause();
+      }
+    }, 50);
+  }, (MAX_SOUND_SECONDS - 0.5) * 1000);
 }
 
 function onState({ state, reason }) {
@@ -71,7 +85,7 @@ function onState({ state, reason }) {
   } else {
     if (ticket !== undefined) history = [ticket, ...history.filter((n) => n !== state.ticket)].slice(0, 3);
     stepPhoto(1);
-    if (state.sound) chime();
+    if (state.sound) playCall(state);
   }
   ticket = state.ticket;
   renderTicket(reason === "back" ? "back" : "call");

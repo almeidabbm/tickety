@@ -6,7 +6,7 @@ const $ = (id) => document.getElementById(id);
 const EASE = "cubic-bezier(0.25, 1, 0.5, 1)";
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-let state = { ticket: null, sound: true, photos: [] };
+let state = { ticket: null, sound: true, photos: [], sounds: [], chime: null };
 let previewName = null;
 let dragged = null;
 let uploading = false;
@@ -36,6 +36,7 @@ function update(next, reason) {
   state = next;
   renderTicket(changed && { old, down });
   $("soundToggle").checked = state.sound;
+  renderSounds();
   if (!dragged) renderPhotos();
 }
 
@@ -473,3 +474,72 @@ if (api.getUpdate) {
   api.getUpdate().then(renderUpdate).catch((err) => console.error("tickety.getUpdate failed", err));
   api.onUpdate(renderUpdate);
 }
+
+// Call sounds: the built-in chime plus any uploaded ones; one is chosen, each can be heard first.
+let previewAudio;
+let player;
+
+function listen(sound) {
+  if (player) player.pause();
+  if (!sound) {
+    previewAudio = previewAudio || new AudioContext();
+    playChime(previewAudio);
+    return;
+  }
+  player = new Audio(sound.url);
+  player.play().catch(() => {
+    $("soundError").textContent = `Não foi possível tocar ${sound.name}. O ficheiro pode estar danificado.`;
+  });
+  setTimeout(() => player && player.pause(), 6000);
+}
+
+function renderSounds() {
+  const choices = [{ name: null, label: "Som suave (incluído)" }, ...state.sounds.map((s) => ({ ...s, label: s.name }))];
+  $("soundList").replaceChildren(
+    ...choices.map((choice) => {
+      const li = document.createElement("li");
+      const label = document.createElement("label");
+      const radio = Object.assign(document.createElement("input"), { type: "radio", name: "chime", checked: state.chime === choice.name });
+      radio.addEventListener("change", () => run(api.setChime(choice.name), $("soundError"), "sound"));
+      label.append(radio, Object.assign(document.createElement("span"), { textContent: choice.label }));
+      const play = Object.assign(document.createElement("button"), { type: "button", className: "quiet", textContent: "Ouvir" });
+      play.setAttribute("aria-label", `Ouvir ${choice.label}`);
+      play.addEventListener("click", () => listen(choice.name && choice));
+      li.append(label);
+      if (choice.name) {
+        const remove = Object.assign(document.createElement("button"), { type: "button", className: "quiet danger", textContent: "Remover" });
+        remove.setAttribute("aria-label", `Remover ${choice.label}`);
+        remove.addEventListener("click", () => run(api.removeSound(choice.name), $("soundError"), "sound"));
+        li.append(remove);
+      }
+      li.append(play); // last, so "Ouvir" lines up on every row
+      return li;
+    })
+  );
+}
+
+async function uploadSounds(files) {
+  $("soundError").textContent = "";
+  const errors = [];
+  let added = 0;
+  // One file per call: sounds are small, and one bad file can't hold back the rest.
+  for (const file of files) {
+    if (file.size > 5 * 1024 * 1024) {
+      errors.push(`${file.name} (maior que 5 MB)`);
+      continue;
+    }
+    $("soundStatus").textContent = `A carregar ${file.name}…`;
+    try {
+      update(await api.addSounds([{ name: file.name, data: await file.arrayBuffer() }]));
+      added++;
+    } catch (error) {
+      errors.push(cleanMessage(error).replace(/^Não foi possível adicionar: /, "").replace(/\.$/, ""));
+    }
+  }
+  $("soundStatus").textContent = added ? `${plural(added, "som adicionado", "sons adicionados")} — escolha-o na lista.` : "";
+  if (errors.length) $("soundError").textContent = `Não foi possível adicionar: ${errors.join(", ")}.`;
+  $("soundInput").value = "";
+}
+
+$("soundPickButton").addEventListener("click", () => $("soundInput").click());
+$("soundInput").addEventListener("change", (event) => uploadSounds([...event.target.files]));

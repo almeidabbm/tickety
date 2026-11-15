@@ -634,3 +634,64 @@ input[type="number"][aria-invalid="true"] {
   color: var(--muted);
   white-space: pre-line;
 }
+
+/* Call sounds: a plain list of choices, one per line. */
+.sounds {
+  margin: 20px 0 12px;
+  padding: 0;
+  border: 0;
+}
+
+.sounds legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.soundList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.soundList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--line);
+}
+
+.soundList label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.soundList label span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.soundList input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.hint {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+button.quiet.danger {
+  color: var(--danger);
+}

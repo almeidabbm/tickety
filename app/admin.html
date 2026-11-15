@@ -2,7 +2,7 @@
 <html lang="pt-PT">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' file: data: blob:; font-src 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' file: data: blob:; font-src 'self'; media-src file:" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./css/admin.css" />
     <title>Tickety — Administração</title>
@@ -36,6 +36,17 @@
             <input type="checkbox" role="switch" id="soundToggle" />
             <span class="track" aria-hidden="true"></span>
           </label>
+          <fieldset class="sounds">
+            <legend>Som da chamada</legend>
+            <ul id="soundList" class="soundList"></ul>
+          </fieldset>
+          <div class="row">
+            <button type="button" id="soundPickButton">Adicionar sons</button>
+            <input id="soundInput" type="file" accept="audio/*,.mp3,.wav,.ogg,.oga,.m4a,.aac" multiple hidden />
+          </div>
+          <p class="hint">MP3, WAV, OGG ou M4A, até 5 MB. Toca no máximo 6 segundos.</p>
+          <p id="soundStatus" class="status" role="status"></p>
+          <div id="soundError" class="error" role="alert"></div>
         </section>
 
         <section aria-labelledby="updateHeading">
@@ -99,5 +110,6 @@
     </div>
   </body>
   <script src="../shared/queue.js" type="application/javascript"></script>
+  <script src="../shared/chime.js" type="application/javascript"></script>
   <script src="../renderers/admin.js" type="application/javascript"></script>
 </html>
