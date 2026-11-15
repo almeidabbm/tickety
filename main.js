@@ -15,6 +15,7 @@ let adminWin = null;
 const toPublic = (state) => ({
   ...state,
   photos: state.photos.map((name) => ({ name, url: pathToFileURL(path.join(store.photosDir, name)).href })),
+  sounds: state.sounds.map((name) => ({ name, url: pathToFileURL(path.join(store.soundsDir, name)).href })),
 });
 
 const broadcast = (reason, state) => {
@@ -138,12 +139,24 @@ app.whenReady().then(() => {
     assert(typeof name === "string", "Fotografia não encontrada.");
     return store.removePhoto(name);
   });
-  handle("tickety:add", null, (files) => {
-    assert(Array.isArray(files) && files.every(isFile), "Ficheiros inválidos.");
-    const { state, refused } = store.addPhotos(files.map(({ name, data }) => ({ name, data: Buffer.from(data) })));
-    if (refused.length < files.length) broadcast("photos", state);
-    assert(refused.length === 0, `Não foi possível adicionar: ${refused.join(", ")}.`);
-    return state;
+  // Uploads broadcast what was saved even when some files were refused, then report the refusals.
+  const handleUpload = (channel, add) =>
+    handle(channel, null, (files) => {
+      assert(Array.isArray(files) && files.every(isFile), "Ficheiros inválidos.");
+      const { state, refused } = add(files.map(({ name, data }) => ({ name, data: Buffer.from(data) })));
+      if (refused.length < files.length) broadcast("photos", state);
+      assert(refused.length === 0, `Não foi possível adicionar: ${refused.join(", ")}.`);
+      return state;
+    });
+  handleUpload("tickety:add", store.addPhotos);
+  handleUpload("tickety:add-sounds", store.addSounds);
+  handle("tickety:remove-sound", "sound", (name) => {
+    assert(typeof name === "string", "Som não encontrado.");
+    return store.removeSound(name);
+  });
+  handle("tickety:chime", "sound", (name) => {
+    assert(name === null || typeof name === "string", "Som não encontrado.");
+    return store.setChime(name);
   });
   ipcMain.on("tickety:open-admin", () => openAdmin());
   updater = startUpdater((status) => {

@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld("tickety", {
   addPhotos: (files) => call("tickety:add", files),
   removePhoto: (name) => call("tickety:remove", name),
   reorderPhotos: (names) => call("tickety:reorder", names),
+  addSounds: (files) => call("tickety:add-sounds", files),
+  removeSound: (name) => call("tickety:remove-sound", name),
+  setChime: (name) => call("tickety:chime", name),
   openAdmin: () => {
     ipcRenderer.send("tickety:open-admin");
   },
