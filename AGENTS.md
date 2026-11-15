@@ -14,8 +14,9 @@ Electron desktop app for a queue "now serving" screen: shows the current ticket 
 
 - `main.js` — main process: fullscreen display window, admin window (Ctrl/Cmd+,), single-instance lock, and the IPC handlers behind `window.tickety`. Validates every renderer argument.
 - `main/updater.js` — electron-updater against GitHub releases: checks every 6 h; Windows/Linux download in the background and install only when staff press "Reiniciar e atualizar" (never on quit); macOS only links to the download page (unsigned apps can't self-update). Release = add a `## <version>` section to `CHANGELOG.md` (plain Portuguese, shown to staff), then `npm version <patch|minor|major>` + `git push --follow-tags`. CI fails the release if that section is missing.
-- `main/store.js` — persistent state (`state.json`) and photo files in Electron's userData folder; no Electron imports, tested with `node --test`.
+- `main/store.js` — persistent state (`state.json`), photo files (`backgrounds/`) and uploaded call sounds (`sounds/`, `chime` = chosen file or null for the built-in) in Electron's userData folder; no Electron imports, tested with `node --test`.
 - `preloaders/preloader.js` — exposes `window.tickety` via `contextBridge`. Any new main-process capability needs an `ipcMain.handle` in `main.js` plus an entry here.
+- `shared/chime.js` — the built-in Web Audio chime, used by the display and the admin preview.
 - `shared/queue.js` — pure logic (ticket wrap, background rotation, image-file filter). Loaded as a plain `<script>` by the page and `require`d by `main.js` and tests, so keep it free of DOM and Electron APIs. Tests sit next to it in `shared/queue.test.js`.
 - `renderers/renderer.js` — display page logic, plain browser script (no modules, no bundler). Enter/Space/→ next, Backspace/← back; cross-fades the photo and plays a Web Audio chime.
 - `app/admin.html`, `app/css/admin.css`, `renderers/admin.js` — admin window: ticket controls, sound toggle, live preview, photo upload (files or folders, in batches), reorder and remove with undo.

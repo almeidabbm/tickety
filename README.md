@@ -15,7 +15,7 @@ The ticket number is saved, so it survives a restart.
 
 ## Admin
 
-Press **Ctrl+,** (**Cmd+,** on a Mac) to open the admin window. From there you can set the number, turn the sound on or off, and manage photos: drop in photos or whole folders, drag to reorder, and remove (with undo).
+Press **Ctrl+,** (**Cmd+,** on a Mac) to open the admin window. From there you can set the number, turn the sound on or off, upload your own call sounds and choose one, and manage photos: drop in photos or whole folders, drag to reorder, and remove (with undo).
 
 ## Download
 
