@@ -52,7 +52,9 @@
           ]
         }
       ],
-      "category": "public.app-category.business"
+      "category": "public.app-category.business",
+      "identity": "-",
+      "hardenedRuntime": false
     },
     "win": {
       "target": [
@@ -74,6 +76,13 @@
         "AppImage"
       ],
       "category": "Office"
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "onlyLoadAppFromAsar": true,
+      "enableCookieEncryption": true
     }
   },
   "dependencies": {

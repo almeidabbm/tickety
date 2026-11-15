@@ -19,7 +19,7 @@ Press **Ctrl+,** (**Cmd+,** on a Mac) to open the admin window. From there you c
 
 ## Download
 
-Installers for Windows (7 or later, 32- and 64-bit), macOS (10.13 or later) and Linux are on the [releases page](https://github.com/almeidabbm/tickety/releases). Installed apps check for new versions every few hours. On Windows and Linux the update downloads in the background, and the admin window shows **Reiniciar e atualizar** when it's ready (it also installs the next time the app closes). On macOS the admin window links to the download page instead. They are not code-signed: on Windows choose "More info" → "Run anyway"; on macOS open System Settings → Privacy & Security → "Open Anyway".
+Installers for Windows (7 or later, 32- and 64-bit) and Linux are on the [releases page](https://github.com/almeidabbm/tickety/releases). Installed apps check for new versions every few hours. On Windows and Linux the update downloads in the background, and the admin window shows **Reiniciar e atualizar** when it's ready. It only installs when someone presses that button. They are not code-signed: on Windows choose "More info" → "Run anyway".
 
 ## Development
 

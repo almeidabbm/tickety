@@ -5,7 +5,7 @@ Electron desktop app for a queue "now serving" screen: shows the current ticket 
 ## Commands
 
 - `npm install` — install dependencies.
-- `npm run dist` — build installers into `dist/` for the current OS (electron-builder). CI (`.github/workflows/build.yml`) builds macOS, Windows and Linux on every push to `main` and publishes a GitHub release for `v*` tags.
+- `npm run dist` — build installers into `dist/` for the current OS (electron-builder). CI (`.github/workflows/build.yml`) builds Windows and Linux (macOS is not released; `npm run dist` still builds it locally) on every push to `main` and publishes a GitHub release for `v*` tags.
 - `npm start` — run the app. `electron-reload` restarts it on file changes.
 - `npm test` — runs `node --test` over `*.test.js` (Node's built-in runner, no dependencies). No linter, formatter, or build/packaging step exist.
 - Debugging: VS Code compound launch "Main + renderer" in `.vscode/launch.json` (renderer attaches on port 9222).
@@ -13,7 +13,7 @@ Electron desktop app for a queue "now serving" screen: shows the current ticket 
 ## Layout
 
 - `main.js` — main process: fullscreen display window, admin window (Ctrl/Cmd+,), single-instance lock, and the IPC handlers behind `window.tickety`. Validates every renderer argument.
-- `main/updater.js` — electron-updater against GitHub releases: checks every 6 h; Windows/Linux download in the background and install on restart (admin "Reiniciar e atualizar" or app quit); macOS only links to the download page (unsigned apps can't self-update). Release = add a `## <version>` section to `CHANGELOG.md` (plain Portuguese, shown to staff), then `npm version <patch|minor|major>` + `git push --follow-tags`. CI fails the release if that section is missing.
+- `main/updater.js` — electron-updater against GitHub releases: checks every 6 h; Windows/Linux download in the background and install only when staff press "Reiniciar e atualizar" (never on quit); macOS only links to the download page (unsigned apps can't self-update). Release = add a `## <version>` section to `CHANGELOG.md` (plain Portuguese, shown to staff), then `npm version <patch|minor|major>` + `git push --follow-tags`. CI fails the release if that section is missing.
 - `main/store.js` — persistent state (`state.json`) and photo files in Electron's userData folder; no Electron imports, tested with `node --test`.
 - `preloaders/preloader.js` — exposes `window.tickety` via `contextBridge`. Any new main-process capability needs an `ipcMain.handle` in `main.js` plus an entry here.
 - `shared/queue.js` — pure logic (ticket wrap, background rotation, image-file filter). Loaded as a plain `<script>` by the page and `require`d by `main.js` and tests, so keep it free of DOM and Electron APIs. Tests sit next to it in `shared/queue.test.js`.
