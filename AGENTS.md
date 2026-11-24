@@ -19,7 +19,7 @@ Electron desktop app for a queue "now serving" screen: shows the current ticket 
 - `shared/chime.js` — the built-in Web Audio chime, used by the display and the admin preview.
 - `shared/queue.js` — pure logic (ticket wrap, background rotation, image-file filter). Loaded as a plain `<script>` by the page and `require`d by `main.js` and tests, so keep it free of DOM and Electron APIs. Tests sit next to it in `shared/queue.test.js`.
 - `renderers/renderer.js` — display page logic, plain browser script (no modules, no bundler). Enter/Space/→/left click next, Backspace/← back; cross-fades the photo and plays a Web Audio chime.
-- `app/admin.html`, `app/css/admin.css`, `renderers/admin.js` — admin window: ticket controls, sound toggle, live preview, photo upload (files or folders, in batches), reorder and remove with undo.
+- `app/admin.html`, `app/css/admin.css`, `renderers/admin.js` — admin window: ticket controls, sound toggle, live preview with the business-name field, photo upload (files or folders, in batches), reorder and remove with undo.
 - `app/index.html`, `app/css/main.css` — display markup and styles.
 - `assets/images/` — default photos, copied into userData on first run only. Staff manage photos from the admin window afterwards.
 - `assets/fonts/` — bundled Inter variable font (OFL, license alongside).
@@ -27,7 +27,8 @@ Electron desktop app for a queue "now serving" screen: shows the current ticket 
 ## How it works
 
 - Two `img.backgroundOverlay` elements alternate: one visible, one `hidden`. Swapping the `hidden` attribute triggers the opacity transitions in `main.css`.
-- Ticket number, sound setting and photo order persist in `userData/state.json`; photos live in `userData/backgrounds/`.
+- Ticket number, sound setting, business name and photo order persist in `userData/state.json`; photos live in `userData/backgrounds/`.
+- The display panel is a three-row grid (`1fr auto 1fr`): the business name hangs in the top row and the ticket sits in the middle row, so the number stays centred whether or not a name is set. The admin preview mirrors it in `cqw` units.
 
 ## Conventions
 

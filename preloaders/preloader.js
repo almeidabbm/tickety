@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld("tickety", {
   back: () => call("tickety:back"),
   setTicket: (n) => call("tickety:set", n),
   setSound: (on) => call("tickety:sound", on),
+  setBusiness: (name) => call("tickety:business", name),
   addPhotos: (files) => call("tickety:add", files),
   removePhoto: (name) => call("tickety:remove", name),
   reorderPhotos: (names) => call("tickety:reorder", names),

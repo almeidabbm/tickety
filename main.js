@@ -131,6 +131,10 @@ app.whenReady().then(() => {
     assert(typeof on === "boolean", "Valor de som inválido.");
     return store.setSound(on);
   });
+  handle("tickety:business", "business", (name) => {
+    assert(typeof name === "string", "Nome inválido.");
+    return store.setBusiness(name);
+  });
   handle("tickety:reorder", "photos", (names) => {
     assert(Array.isArray(names) && names.every((name) => typeof name === "string"), "Ordem inválida.");
     return store.reorderPhotos(names);

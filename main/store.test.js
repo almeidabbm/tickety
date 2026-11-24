@@ -24,16 +24,16 @@ function setup({ seed = [] } = {}) {
 
 test("defaults on first run", () => {
   const { open } = setup();
-  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null });
+  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null, business: "" });
 });
 
 test("corrupt state file falls back to defaults", () => {
   const { dir, open } = setup();
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "state.json"), "{not json");
-  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null });
+  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null, business: "" });
   fs.writeFileSync(path.join(dir, "state.json"), JSON.stringify({ ticket: 500, sound: "yes", photos: "x" }));
-  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null });
+  assert.deepEqual(open().getState(), { ticket: 1, sound: true, photos: [], sounds: [], chime: null, business: "" });
 });
 
 test("ticket and sound persist across a reload, written atomically", () => {
@@ -42,8 +42,21 @@ test("ticket and sound persist across a reload, written atomically", () => {
   store.setTicket(42);
   store.next();
   store.setSound(false);
-  assert.deepEqual(open().getState(), { ticket: 43, sound: false, photos: [], sounds: [], chime: null });
+  assert.deepEqual(open().getState(), { ticket: 43, sound: false, photos: [], sounds: [], chime: null, business: "" });
   assert.ok(!fs.existsSync(path.join(dir, "state.json.tmp")));
+});
+
+test("business name is tidied, persisted and validated", () => {
+  const { dir, open } = setup();
+  const store = open();
+  assert.equal(store.setBusiness("  Pastelaria   Aurora ").business, "Pastelaria Aurora");
+  assert.equal(open().getState().business, "Pastelaria Aurora");
+  assert.throws(() => store.setBusiness("x".repeat(61)), /60 caracteres/);
+  assert.throws(() => store.setBusiness(42));
+  assert.equal(store.getState().business, "Pastelaria Aurora");
+  assert.equal(store.setBusiness("").business, "");
+  fs.writeFileSync(path.join(dir, "state.json"), JSON.stringify({ business: { evil: true } }));
+  assert.equal(open().getState().business, "");
 });
 
 test("next and back wrap around", () => {

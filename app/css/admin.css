@@ -187,7 +187,8 @@ label {
   margin-top: 8px;
 }
 
-input[type="number"] {
+input[type="number"],
+input[type="text"] {
   width: 92px;
   min-height: 44px;
   padding: 0 14px;
@@ -201,7 +202,13 @@ input[type="number"] {
   font-variant-numeric: tabular-nums;
 }
 
-input[type="number"]:focus-visible {
+input[type="text"] {
+  flex: 1 1 220px;
+  font-variant-numeric: normal;
+}
+
+input[type="number"]:focus-visible,
+input[type="text"]:focus-visible {
   outline-offset: -1px;
 }
 
@@ -315,17 +322,46 @@ input[type="number"][aria-invalid="true"] {
   position: absolute;
   inset: 0 0 0 auto;
   width: 40cqw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 6cqw 0 5cqw;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  row-gap: 2.25cqw;
+  padding: 0 5cqw;
   background: var(--paper);
   box-shadow: -1px 0 0 rgb(15 27 45 / .1);
+  text-align: center;
+}
+
+.previewBusiness {
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  padding-top: 3.94cqw;
+  font-size: 2.48cqw;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.previewBusiness.long {
+  font-size: 1.74cqw;
+}
+
+.previewBusiness[hidden] {
+  display: none;
+}
+
+.previewTicket {
+  grid-row: 2;
 }
 
 .previewTitle {
   margin: 0;
-  padding-bottom: 1.24cqw;
+  padding: 0 0 1.24cqw .24em;
   border-bottom: max(1px, .1cqw) solid var(--accent);
   font-size: 1.46cqw;
   font-weight: 600;
@@ -334,7 +370,8 @@ input[type="number"][aria-invalid="true"] {
 }
 
 .previewNumber {
-  margin: .84cqw 0 0 -.06em;
+  margin: .84cqw 0 0;
+  padding-right: .05em;
   font-size: 22cqw;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -353,7 +390,7 @@ input[type="number"][aria-invalid="true"] {
 
 .previewHistory p {
   margin: 0;
-  padding-bottom: .68cqw;
+  padding: 0 0 .68cqw .2em;
   color: var(--muted);
   font-size: 1.07cqw;
   font-weight: 600;
@@ -363,24 +400,31 @@ input[type="number"][aria-invalid="true"] {
 
 .previewHistory ol {
   display: flex;
-  margin: 0;
+  width: calc(3 * (2.2ch + 1.4cqw));
+  margin: 0 auto;
   padding: 0;
   list-style: none;
-}
-
-.previewHistory li {
-  min-width: 2.2ch;
-  padding: .51cqw 1.4cqw 0 0;
-  border-top: 1px solid rgb(15 27 45 / .18);
-  color: var(--muted);
   font-size: 3.38cqw;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
+.previewHistory li {
+  min-width: 2.2ch;
+  padding: .51cqw .7cqw 0;
+  border-top: 1px solid rgb(15 27 45 / .18);
+  color: var(--muted);
+}
+
 .previewHistory li:first-child {
   color: var(--ink);
+}
+
+/* Business name, under the preview it changes */
+
+.businessForm {
+  margin-top: 20px;
 }
 
 /* Photos */

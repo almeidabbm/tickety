@@ -6,7 +6,8 @@ const $ = (id) => document.getElementById(id);
 const EASE = "cubic-bezier(0.25, 1, 0.5, 1)";
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-let state = { ticket: null, sound: true, photos: [], sounds: [], chime: null };
+let state = { ticket: null, sound: true, photos: [], sounds: [], chime: null, business: "" };
+let savingBusiness = null; // the name on its way to main, so Enter + blur don't save it twice
 let previewName = null;
 let dragged = null;
 let uploading = false;
@@ -36,6 +37,7 @@ function update(next, reason) {
   state = next;
   renderTicket(changed && { old, down });
   $("soundToggle").checked = state.sound;
+  renderBusiness();
   renderSounds();
   if (!dragged) renderPhotos();
 }
@@ -341,6 +343,47 @@ $("ticketInput").addEventListener("input", () => {
 });
 
 $("soundToggle").addEventListener("change", (event) => run(api.setSound(event.target.checked), $("ticketError")));
+
+// Business name: the preview follows the field while staff type; it's saved on Enter, on leaving the field, or with "Guardar".
+function renderBusiness() {
+  const input = $("businessInput");
+  if (document.activeElement !== input && savingBusiness === null) input.value = state.business;
+  const draft = parseBusinessName(input.value);
+  const shown = draft === null ? input.value.trim() : draft;
+  $("previewBusiness").textContent = shown;
+  $("previewBusiness").hidden = !shown;
+  $("previewBusiness").classList.toggle("long", isLongBusinessName(shown));
+  $("businessSave").disabled = draft === state.business;
+}
+
+function saveBusiness() {
+  const input = $("businessInput");
+  const name = parseBusinessName(input.value);
+  if (name === null) {
+    $("businessError").textContent = `O nome pode ter no máximo ${MAX_BUSINESS_NAME} caracteres.`;
+    return;
+  }
+  if (name === state.business || name === savingBusiness) return;
+  savingBusiness = name;
+  run(api.setBusiness(name), $("businessError")).then(() => {
+    savingBusiness = null;
+    if (state.business !== name) return;
+    input.value = name;
+    $("businessSave").textContent = "Guardado";
+    renderBusiness();
+  });
+}
+
+$("businessForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveBusiness();
+});
+$("businessInput").addEventListener("change", saveBusiness);
+$("businessInput").addEventListener("input", () => {
+  $("businessError").textContent = "";
+  $("businessSave").textContent = "Guardar";
+  renderBusiness();
+});
 
 // Photo picking and file drops
 $("pickButton").addEventListener("click", () => $("fileInput").click());

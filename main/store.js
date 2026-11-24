@@ -1,7 +1,7 @@
 // Persistent state and photo storage. No Electron here: directories and trash are passed in, so tests can use a temp dir.
 const fs = require("node:fs");
 const path = require("node:path");
-const { advanceTicket, previousTicket, parseTicket, isImageFile, isSoundFile } = require("../shared/queue");
+const { advanceTicket, previousTicket, parseTicket, parseBusinessName, MAX_BUSINESS_NAME, isImageFile, isSoundFile } = require("../shared/queue");
 
 const MAX_PHOTO_BYTES = 25 * 1024 * 1024;
 const MAX_SOUND_BYTES = 5 * 1024 * 1024;
@@ -80,6 +80,8 @@ function openStore({ dir, seedDir, trash }) {
     sounds,
     // null = the built-in chime.
     chime: sounds.includes(raw.chime) ? raw.chime : null,
+    // Shown above the ticket; "" = no name.
+    business: parseBusinessName(raw.business) ?? "",
   };
 
   // Write first, then update memory, so a failed save never leaves the two out of step.
@@ -141,6 +143,11 @@ function openStore({ dir, seedDir, trash }) {
       return commit({ ticket });
     },
     setSound: (sound) => commit({ sound: Boolean(sound) }),
+    setBusiness: (value) => {
+      const business = parseBusinessName(value);
+      if (business === null) throw new Error(`O nome pode ter no máximo ${MAX_BUSINESS_NAME} caracteres.`);
+      return commit({ business });
+    },
     addPhotos: (files) => addFiles(files, photos),
     addSounds: (files) => addFiles(files, soundFiles),
     setChime: (name) => {

@@ -1,5 +1,6 @@
 const ticketCard = document.getElementById("ticketCard");
 const ticketNumber = document.getElementById("ticketNumber");
+const businessEl = document.getElementById("business");
 const historyEl = document.getElementById("history");
 const historyList = document.getElementById("historyList");
 const images = document.querySelectorAll("img.backgroundOverlay");
@@ -41,6 +42,12 @@ function renderTicket(motion) {
   ticketCard.className = motion;
 }
 
+function renderBusiness(name) {
+  businessEl.textContent = name;
+  businessEl.hidden = !name;
+  businessEl.classList.toggle("long", isLongBusinessName(name));
+}
+
 function chime() {
   playChime(audio);
 }
@@ -72,6 +79,7 @@ function playCall(state) {
 }
 
 function onState({ state, reason }) {
+  if (reason === "business") return renderBusiness(state.business);
   if (reason === "photos") {
     photos = state.photos;
     showPhoto(photos.some((p) => p.name === currentPhoto) ? currentPhoto : photos[0] && photos[0].name);
@@ -129,6 +137,7 @@ if (!window.tickety) {
       ticket = state.ticket;
       photos = state.photos;
       showPhoto(photos[0] && photos[0].name);
+      renderBusiness(state.business);
       renderTicket("intro");
     })
     .catch((err) => console.error("tickety.getState failed", err));

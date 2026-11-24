@@ -15,6 +15,21 @@ function parseTicket(value) {
   return Number.isInteger(number) && number >= 1 && number <= MAX_TICKET_NUM ? number : null;
 }
 
+const MAX_BUSINESS_NAME = 60;
+
+// The business name shown above the ticket: whitespace collapsed, control characters dropped.
+// "" means no name; null if it isn't text or is longer than MAX_BUSINESS_NAME.
+function parseBusinessName(value) {
+  if (typeof value !== "string") return null;
+  const name = value.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
+  return name.length <= MAX_BUSINESS_NAME ? name : null;
+}
+
+// Long names get smaller type so up to MAX_BUSINESS_NAME characters fit in two lines.
+function isLongBusinessName(name) {
+  return name.length > 24;
+}
+
 function nextBackgroundName(backgrounds, current) {
   if (backgrounds.length === 0) return undefined;
   const index = backgrounds.indexOf(current);
@@ -35,6 +50,9 @@ if (typeof module !== "undefined") {
     advanceTicket,
     previousTicket,
     parseTicket,
+    MAX_BUSINESS_NAME,
+    parseBusinessName,
+    isLongBusinessName,
     nextBackgroundName,
     isImageFile,
     isSoundFile,

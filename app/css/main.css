@@ -67,24 +67,56 @@ p, ol {
   background: linear-gradient(to left, rgb(15 27 45 / .25), rgb(15 27 45 / 0) 30%);
 }
 
-/* Solid panel anchored right, like a printed sign beside the photo. */
+/* Solid panel anchored right, like a printed sign beside the photo.
+   Three rows: the business name hangs from the top, the ticket sits dead centre
+   whether or not there is a name, and an empty row balances the first. */
 #ticketCard {
   position: absolute;
   inset: 0 0 0 auto;
   width: var(--panel-width);
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 6vw 0 5vw;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  row-gap: 4vh; /* between equal rows, so the ticket stays centred */
+  padding: 0 5vw;
   background: var(--paper);
   box-shadow: -1px 0 0 rgb(15 27 45 / .1);
+  text-align: center;
   perspective: 80vh;
 }
 
+#business {
+  grid-row: 1;
+  align-self: start;
+  padding-top: 7vh;
+  font-size: clamp(1.1rem, 4.4vh, 3.4rem);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  /* At most two lines: with .long type, a 60-character name fits at any panel width. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+#business.long {
+  font-size: clamp(1rem, 3.1vh, 2.4rem);
+}
+
+#business[hidden] {
+  display: none;
+}
+
+#ticket {
+  grid-row: 2;
+}
+
+/* Tracking adds space after the last letter; matching padding on the left keeps the word centred. */
 #title {
   position: relative;
-  padding-bottom: 2.2vh;
+  padding: 0 0 2.2vh .24em;
   font-size: clamp(.9rem, 2.6vh, 2rem);
   font-weight: 600;
   letter-spacing: .24em;
@@ -98,11 +130,13 @@ p, ol {
   inset: auto 0 0;
   height: 2px;
   background: var(--accent);
-  transform-origin: left;
+  transform-origin: center;
 }
 
+/* The negative tracking pulls the box in past the last digit; padding-right re-centres the ink. */
 #ticketNumber {
-  margin: 1.5vh 0 0 -.06em;
+  margin-top: 1.5vh;
+  padding-right: .05em;
   font-size: min(42vh, 22vw);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -116,7 +150,7 @@ p, ol {
 }
 
 #history p {
-  padding-bottom: 1.2vh;
+  padding: 0 0 1.2vh .2em;
   color: var(--muted);
   font-size: clamp(.8rem, 1.9vh, 1.5rem);
   font-weight: 600;
@@ -124,21 +158,24 @@ p, ol {
   text-transform: uppercase;
 }
 
+/* Always three slots wide and centred, so numbers keep their places as the list fills up. */
 #history ol {
   display: flex;
+  width: calc(3 * (2.2ch + 1.4vw));
+  margin: 0 auto;
   overflow: hidden; /* the newest entry slides in from behind the left edge */
   list-style: none;
-}
-
-#history li {
-  min-width: 2.2ch;
-  padding: .9vh 1.4vw 0 0;
-  border-top: 1px solid rgb(15 27 45 / .18);
-  color: var(--muted);
   font-size: clamp(1.2rem, 6vh, 4.5rem);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
+}
+
+#history li {
+  min-width: 2.2ch;
+  padding: .9vh .7vw 0;
+  border-top: 1px solid rgb(15 27 45 / .18);
+  color: var(--muted);
 }
 
 #history li:first-child {
@@ -161,7 +198,8 @@ p, ol {
   .back #ticketNumber { animation: flapBack 360ms var(--ease-quart); }
   .back #history li { animation: shiftBack 340ms var(--ease-quart); }
 
-  /* First load, once: label, rule, number, history. */
+  /* First load, once: name, label, rule, number, history. */
+  .intro #business { animation: rise 360ms var(--ease-quart) both; }
   .intro #title { animation: rise 360ms var(--ease-quart) both; }
   .intro #title::after { animation: sweep 420ms var(--ease-expo) 100ms both; }
   .intro #ticketNumber { animation: rise 400ms var(--ease-quart) 180ms both; }
@@ -181,7 +219,7 @@ p, ol {
   from { transform: scaleX(0); }
 }
 
-/* One history slot = min-width + right padding of an li. */
+/* One history slot = min-width + horizontal padding of an li. */
 @keyframes shift {
   from { transform: translateX(calc(-2.2ch - 1.4vw)); }
 }

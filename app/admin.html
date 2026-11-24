@@ -71,14 +71,26 @@
           <div class="preview" aria-hidden="true">
             <img id="previewPhoto" alt="" hidden />
             <div class="previewPanel">
-              <p class="previewTitle">Senha atual</p>
-              <p id="previewNumber" class="previewNumber">–</p>
-              <div id="previewHistory" class="previewHistory" hidden>
-                <p>Anteriores</p>
-                <ol id="previewHistoryList"></ol>
+              <p id="previewBusiness" class="previewBusiness" hidden></p>
+              <div class="previewTicket">
+                <p class="previewTitle">Senha atual</p>
+                <p id="previewNumber" class="previewNumber">–</p>
+                <div id="previewHistory" class="previewHistory" hidden>
+                  <p>Anteriores</p>
+                  <ol id="previewHistoryList"></ol>
+                </div>
               </div>
             </div>
           </div>
+          <form id="businessForm" class="businessForm" novalidate>
+            <label for="businessInput">Nome do negócio</label>
+            <div class="row">
+              <input id="businessInput" type="text" maxlength="60" autocomplete="off" placeholder="Ex.: Pastelaria Aurora" aria-describedby="businessHint businessError" />
+              <button type="submit" id="businessSave" disabled>Guardar</button>
+            </div>
+            <p id="businessHint" class="hint">Aparece no topo do ecrã, por cima da senha. Deixe em branco para não mostrar nenhum nome.</p>
+            <p id="businessError" class="error" aria-live="polite"></p>
+          </form>
         </section>
 
         <section class="photos" aria-labelledby="photosHeading">

@@ -4,6 +4,8 @@ const {
   advanceTicket,
   previousTicket,
   parseTicket,
+  parseBusinessName,
+  isLongBusinessName,
   nextBackgroundName,
   isImageFile,
 } = require("./queue");
@@ -28,6 +30,24 @@ test("parseTicket accepts whole numbers 1..99 only", () => {
   for (const bad of [0, 100, -1, 1.5, NaN, Infinity, "", "abc", "4.2", "1e1", null, undefined, true, [5], {}]) {
     assert.equal(parseTicket(bad), null, `expected null for ${String(bad)}`);
   }
+});
+
+test("parseBusinessName tidies whitespace and caps the length", () => {
+  assert.equal(parseBusinessName("Pastelaria Aurora"), "Pastelaria Aurora");
+  assert.equal(parseBusinessName("  Café \t do   Largo\n"), "Café do Largo");
+  assert.equal(parseBusinessName("A\u0000B"), "A B");
+  assert.equal(parseBusinessName(""), "");
+  assert.equal(parseBusinessName("   "), "");
+  assert.equal(parseBusinessName("x".repeat(60)), "x".repeat(60));
+  assert.equal(parseBusinessName(` ${"x".repeat(60)} `), "x".repeat(60));
+  assert.equal(parseBusinessName("x".repeat(61)), null);
+  for (const bad of [undefined, null, 5, true, ["a"], {}]) assert.equal(parseBusinessName(bad), null);
+});
+
+test("isLongBusinessName flags names that need smaller type", () => {
+  assert.equal(isLongBusinessName("Pastelaria Aurora"), false);
+  assert.equal(isLongBusinessName("x".repeat(24)), false);
+  assert.equal(isLongBusinessName("x".repeat(25)), true);
 });
 
 test("nextBackgroundName rotates through the list", () => {
