@@ -9,7 +9,7 @@ npm install
 npm start
 ```
 
-The app opens fullscreen. Press **Enter** (or Space / →) to call the next ticket, and **Backspace** (or ←) to go back. Numbers go from 1 to 99 and then start again at 1. Each call plays a soft chime and fades to the next photo. **F11** leaves or enters fullscreen.
+The app opens fullscreen. Press **Enter** (or Space / → / a mouse click) to call the next ticket, and **Backspace** (or ←) to go back. Numbers go from 1 to 99 and then start again at 1. Each call plays a soft chime and fades to the next photo. **F11** leaves or enters fullscreen.
 
 The ticket number is saved, so it survives a restart.
 

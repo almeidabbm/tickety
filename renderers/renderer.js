@@ -112,6 +112,13 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+// A left click anywhere on the display calls the next ticket, like Enter or Space.
+document.addEventListener("click", (event) => {
+  if (audio.state === "suspended") audio.resume();
+  if (event.button !== 0 || !window.tickety) return;
+  call("next");
+});
+
 if (!window.tickety) {
   console.error("window.tickety is missing; the preload script did not load");
 } else {
